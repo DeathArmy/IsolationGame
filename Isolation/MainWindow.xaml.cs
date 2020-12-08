@@ -20,7 +20,6 @@ namespace Isolation
     /// </summary>
     public partial class MainWindow : Window
     {
-        private bool blockingMode = false;
         private bool whiteTurn = true;
         private int[] whitePawnPosition = new int[2] { 6, 3 };
         private int[] blackPawnPosition = new int[2] { 0, 3 };
@@ -32,44 +31,110 @@ namespace Isolation
                                                     {'e','e','e','e','e','e','e'},
                                                     {'e','e','e','w','e','e','e'},
                                                     };
+
         public MainWindow()
         {
             InitializeComponent();
-            btn00.Click += GameOnClick;
-            btn00.MouseEnter += GameMouseOver;
-            btn00.MouseLeave += GameMouseLeave;
+            List<Button> buttons = new List<Button>() { btn00, btn01, btn02, btn03, btn04, btn05, btn06,
+                                                        btn10, btn11, btn12, btn13, btn14, btn15, btn16,
+                                                        btn20, btn21, btn22, btn23, btn24, btn25, btn26,
+                                                        btn30, btn31, btn32, btn33, btn34, btn35, btn36,
+                                                        btn40, btn41, btn42, btn43, btn44, btn45, btn46,
+                                                        btn50, btn51, btn52, btn53, btn54, btn55, btn56,
+                                                        btn60, btn61, btn62, btn63, btn64, btn65, btn66};
+            foreach (var button in buttons)
+            {
+                button.PreviewMouseDown += GameOnClick;
+                button.MouseEnter += GameMouseOver;
+                button.MouseLeave += GameMouseLeave;
+            }
+            SetProperBackground();
+            ResetGameButton.Click += ResetGame;
         }
 
-        private void GameOnClick(object sender, RoutedEventArgs e)
+        private void ResetGame(object sender, RoutedEventArgs e)
+        {
+            gameBoard = new char[7, 7] {{'e','e','e','b','e','e','e'},
+                                        {'e','e','e','e','e','e','e'},
+                                        {'e','e','e','e','e','e','e'},
+                                        {'e','e','e','e','e','e','e'},
+                                        {'e','e','e','e','e','e','e'},
+                                        {'e','e','e','e','e','e','e'},
+                                        {'e','e','e','w','e','e','e'},
+                                        };
+            SetProperBackground();
+    }
+
+        private void GameOnClick(object sender, MouseButtonEventArgs e)
         {
             var btn = (Button)sender;
             string btnName = btn.Name;
             int i, j = 0;
             int.TryParse(btnName[btnName.Length - 2].ToString(), out i);
             int.TryParse(btnName[btnName.Length - 1].ToString(), out j);
-            if (gameBoard[i,j] == 'e' && blockingMode == false)
+
+            if (e.ChangedButton == MouseButton.Left)
             {
-                //sprawdzić czy ruch jest możliwy
-                //ustawić dla obecnej pozycji pionka tło active_none
-                //ustawić dla klikniętego pola tło active_none_white_pawn lub ..._black_pawn
-                //zaktualizować gameBoard oraz whitePawnPosition lub blackPawnPosition
-            }
-            else if (gameBoard[i, j] == 'e' && blockingMode == true)
-            {
-                //ustawić dla wybranego pola tło inactive
-                //zaktaulizować gameBoard
-            }
-            else if (gameBoard[i, j] == 'b' && blockingMode == true)
-            {
-                //ruch niemożliwy
-            }
-            else if (gameBoard[i, j] == 'w' && blockingMode == true)
-            {
-                //wyświetlić informację, że należy kliknąć w pole, do którego chcemy przemieścić pionka
+                switch (gameBoard[i,j])
+                {
+                    case 'e':
+                        {
+                            if (whiteTurn == true)
+                            {
+                                gameBoard[i, j] = 'w';
+                                gameBoard[whitePawnPosition[0], whitePawnPosition[1]] = 'e';
+                                whitePawnPosition[0] = i;
+                                whitePawnPosition[1] = j;
+                                whiteTurn = false;
+                                ErrorBox.Text = "";
+                            }
+                            else
+                            {
+                                gameBoard[i, j] = 'b';
+                                gameBoard[blackPawnPosition[0], blackPawnPosition[1]] = 'e';
+                                blackPawnPosition[0] = i;
+                                blackPawnPosition[1] = j;
+                                whiteTurn = true;
+                                ErrorBox.Text = "";
+                            }
+                            SetProperBackground();
+                            break;
+                        }
+                    default:
+                        {
+                            ErrorBox.Text = "Ruch niemożliwy!";
+                            break;
+                        }
+                }
+
             }
             else
             {
-                //pozostałe przypadki?
+                switch (gameBoard[i, j])
+                {
+                    case 'e':
+                        {
+                            if (whiteTurn == true)
+                            {
+                                gameBoard[i, j] = 'd';
+                                whiteTurn = false;
+                                ErrorBox.Text = "";
+                            }
+                            else
+                            {
+                                gameBoard[i, j] = 'd';
+                                whiteTurn = true;
+                                ErrorBox.Text = "";
+                            }
+                            SetProperBackground();
+                            break;
+                        }
+                    default:
+                        {
+                            ErrorBox.Text = "Ruch niemożliwy!";
+                            break;
+                        }
+                }
             }
         }
         private void GameMouseOver(object sender, RoutedEventArgs e)
@@ -130,6 +195,45 @@ namespace Isolation
             {
                 tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Inactive_none.png"));
                 btn.Background = tempImg;
+            }
+        }
+
+        private void SetProperBackground()
+        {
+            List<Button> buttons = new List<Button>() { btn00, btn01, btn02, btn03, btn04, btn05, btn06,
+                                                        btn10, btn11, btn12, btn13, btn14, btn15, btn16,
+                                                        btn20, btn21, btn22, btn23, btn24, btn25, btn26,
+                                                        btn30, btn31, btn32, btn33, btn34, btn35, btn36,
+                                                        btn40, btn41, btn42, btn43, btn44, btn45, btn46,
+                                                        btn50, btn51, btn52, btn53, btn54, btn55, btn56,
+                                                        btn60, btn61, btn62, btn63, btn64, btn65, btn66};
+            foreach (var button in buttons)
+            {
+                string btnName = button.Name;
+                int i, j = 0;
+                int.TryParse(btnName[btnName.Length - 2].ToString(), out i);
+                int.TryParse(btnName[btnName.Length - 1].ToString(), out j);
+                ImageBrush tempImg = new ImageBrush();
+                if (gameBoard[i, j] == 'e')
+                {
+                    tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none.png"));
+                    button.Background = tempImg;
+                }
+                else if (gameBoard[i, j] == 'b')
+                {
+                    tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_black_pawn.png"));
+                    button.Background = tempImg;
+                }
+                else if (gameBoard[i, j] == 'w')
+                {
+                    tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_white_pawn.png"));
+                    button.Background = tempImg;
+                }
+                else
+                {
+                    tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Inactive_none.png"));
+                    button.Background = tempImg;
+                }
             }
         }
     }
