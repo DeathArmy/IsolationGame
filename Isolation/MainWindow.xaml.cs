@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace Isolation
 {
-    /// <summary>
-    /// Logika interakcji dla klasy MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private bool whiteTurn = true;
@@ -62,9 +59,13 @@ namespace Isolation
                                         {'e','e','e','e','e','e','e'},
                                         {'e','e','e','w','e','e','e'},
                                         };
+            whiteTurn = true;
+            whitePawnPosition[0] = 6;
+            whitePawnPosition[1] = 3;
+            blackPawnPosition[0] = 0;
+            blackPawnPosition[1] = 3;
             SetProperBackground();
     }
-
         private void GameOnClick(object sender, MouseButtonEventArgs e)
         {
             var btn = (Button)sender;
@@ -79,26 +80,35 @@ namespace Isolation
                 {
                     case 'e':
                         {
-                            if (whiteTurn == true)
+                            int[] MoveCords = new int[2] { i, j };
+                            if (MoveIsValid(MoveCords))
                             {
-                                gameBoard[i, j] = 'w';
-                                gameBoard[whitePawnPosition[0], whitePawnPosition[1]] = 'e';
-                                whitePawnPosition[0] = i;
-                                whitePawnPosition[1] = j;
-                                whiteTurn = false;
-                                ErrorBox.Text = "";
+                                if (whiteTurn == true)
+                                {
+                                    gameBoard[i, j] = 'w';
+                                    gameBoard[whitePawnPosition[0], whitePawnPosition[1]] = 'e';
+                                    whitePawnPosition[0] = i;
+                                    whitePawnPosition[1] = j;
+                                    whiteTurn = false;
+                                    ErrorBox.Text = "";
+                                }
+                                else
+                                {
+                                    gameBoard[i, j] = 'b';
+                                    gameBoard[blackPawnPosition[0], blackPawnPosition[1]] = 'e';
+                                    blackPawnPosition[0] = i;
+                                    blackPawnPosition[1] = j;
+                                    whiteTurn = true;
+                                    ErrorBox.Text = "";
+                                }
+                                SetProperBackground();
+                                break;
                             }
                             else
                             {
-                                gameBoard[i, j] = 'b';
-                                gameBoard[blackPawnPosition[0], blackPawnPosition[1]] = 'e';
-                                blackPawnPosition[0] = i;
-                                blackPawnPosition[1] = j;
-                                whiteTurn = true;
-                                ErrorBox.Text = "";
-                            }
-                            SetProperBackground();
-                            break;
+                                ErrorBox.Text = "Nieprawidłowy ruch!";
+                                break;
+                            } 
                         }
                     default:
                         {
@@ -197,7 +207,6 @@ namespace Isolation
                 btn.Background = tempImg;
             }
         }
-
         private void SetProperBackground()
         {
             List<Button> buttons = new List<Button>() { btn00, btn01, btn02, btn03, btn04, btn05, btn06,
@@ -234,6 +243,55 @@ namespace Isolation
                     tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Inactive_none.png"));
                     button.Background = tempImg;
                 }
+            }
+        }
+        private bool MoveIsValid(int[] newCords)
+        {
+            int[] PawnPosition;
+            if (whiteTurn == true)
+            {
+                PawnPosition = whitePawnPosition;
+            }
+            else
+            {
+                PawnPosition = blackPawnPosition;
+            }
+                
+            if (PawnPosition[0] == newCords[0] && PawnPosition[1] + 1 == newCords[1])
+            {
+                return true;
+            }
+            else if (PawnPosition[0] == newCords[0] && PawnPosition[1] - 1 == newCords[1])
+            {
+                return true;
+            }
+            else if (PawnPosition[0] + 1 == newCords[0] && PawnPosition[1] - 1 == newCords[1])
+            {
+                return true;
+            }
+            else if (PawnPosition[0] - 1 == newCords[0] && PawnPosition[1] - 1 == newCords[1])
+            {
+                return true;
+            }
+            else if (PawnPosition[0] - 1 == newCords[0] && PawnPosition[1] == newCords[1])
+            {
+                return true;
+            }
+            else if (PawnPosition[0] + 1 == newCords[0] && PawnPosition[1] == newCords[1])
+            {
+                return true;
+            }
+            else if (PawnPosition[0] - 1 == newCords[0] && PawnPosition[1] + 1 == newCords[1])
+            {
+                return true;
+            }
+            else if (PawnPosition[0] + 1 == newCords[0] && PawnPosition[1] + 1 == newCords[1])
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }
