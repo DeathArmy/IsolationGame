@@ -65,7 +65,7 @@ namespace Isolation
             blackPawnPosition[0] = 0;
             blackPawnPosition[1] = 3;
             SetProperBackground();
-    }
+        }
         private void GameOnClick(object sender, MouseButtonEventArgs e)
         {
             var btn = (Button)sender;
@@ -76,7 +76,7 @@ namespace Isolation
 
             if (e.ChangedButton == MouseButton.Left)
             {
-                switch (gameBoard[i,j])
+                switch (gameBoard[i, j])
                 {
                     case 'e':
                         {
@@ -108,7 +108,7 @@ namespace Isolation
                             {
                                 ErrorBox.Text = "Nieprawidłowy ruch!";
                                 break;
-                            } 
+                            }
                         }
                     default:
                         {
@@ -156,7 +156,7 @@ namespace Isolation
             int.TryParse(btnName[btnName.Length - 1].ToString(), out j);
             ImageBrush tempImg = new ImageBrush();
 
-            if (gameBoard[i,j] == 'e')
+            if (gameBoard[i, j] == 'e')
             {
                 tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_mouseover.png"));
                 btn.Background = tempImg;
@@ -209,41 +209,70 @@ namespace Isolation
         }
         private void SetProperBackground()
         {
-            List<Button> buttons = new List<Button>() { btn00, btn01, btn02, btn03, btn04, btn05, btn06,
+            if (GameWon())
+            {
+                MessageBoxResult result;
+                if (whiteTurn)
+                {
+                    result = MessageBox.Show("Black won!\nClicking \"OK\" will start a new game.\nClicking \"Cancel\" will close the game.", "Isolation Game", MessageBoxButton.OKCancel);
+                }
+                else
+                {
+                    result = MessageBox.Show("White won!\nClicking \"OK\" will start a new game.\nClicking \"Cancel\" will close the game.", "Isolation Game", MessageBoxButton.OKCancel);
+                }
+                switch (result)
+                {
+                    case MessageBoxResult.OK:
+                        {
+                            ResetGameButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                            break;
+                        }
+                    case MessageBoxResult.Cancel:
+                        {
+                            Environment.Exit(0);
+                            break;
+                        }
+                }
+                    
+            }
+            else
+            {
+                List<Button> buttons = new List<Button>() { btn00, btn01, btn02, btn03, btn04, btn05, btn06,
                                                         btn10, btn11, btn12, btn13, btn14, btn15, btn16,
                                                         btn20, btn21, btn22, btn23, btn24, btn25, btn26,
                                                         btn30, btn31, btn32, btn33, btn34, btn35, btn36,
                                                         btn40, btn41, btn42, btn43, btn44, btn45, btn46,
                                                         btn50, btn51, btn52, btn53, btn54, btn55, btn56,
                                                         btn60, btn61, btn62, btn63, btn64, btn65, btn66};
-            foreach (var button in buttons)
-            {
-                string btnName = button.Name;
-                int i, j = 0;
-                int.TryParse(btnName[btnName.Length - 2].ToString(), out i);
-                int.TryParse(btnName[btnName.Length - 1].ToString(), out j);
-                ImageBrush tempImg = new ImageBrush();
-                if (gameBoard[i, j] == 'e')
+                foreach (var button in buttons)
                 {
-                    tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none.png"));
-                    button.Background = tempImg;
+                    string btnName = button.Name;
+                    int i, j = 0;
+                    int.TryParse(btnName[btnName.Length - 2].ToString(), out i);
+                    int.TryParse(btnName[btnName.Length - 1].ToString(), out j);
+                    ImageBrush tempImg = new ImageBrush();
+                    if (gameBoard[i, j] == 'e')
+                    {
+                        tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none.png"));
+                        button.Background = tempImg;
+                    }
+                    else if (gameBoard[i, j] == 'b')
+                    {
+                        tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_black_pawn.png"));
+                        button.Background = tempImg;
+                    }
+                    else if (gameBoard[i, j] == 'w')
+                    {
+                        tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_white_pawn.png"));
+                        button.Background = tempImg;
+                    }
+                    else
+                    {
+                        tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Inactive_none.png"));
+                        button.Background = tempImg;
+                    }
                 }
-                else if (gameBoard[i, j] == 'b')
-                {
-                    tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_black_pawn.png"));
-                    button.Background = tempImg;
-                }
-                else if (gameBoard[i, j] == 'w')
-                {
-                    tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_white_pawn.png"));
-                    button.Background = tempImg;
-                }
-                else
-                {
-                    tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Inactive_none.png"));
-                    button.Background = tempImg;
-                }
-            }
+            }           
         }
         private bool MoveIsValid(int[] newCords)
         {
@@ -256,7 +285,7 @@ namespace Isolation
             {
                 PawnPosition = blackPawnPosition;
             }
-                
+
             if (PawnPosition[0] == newCords[0] && PawnPosition[1] + 1 == newCords[1])
             {
                 return true;
@@ -294,5 +323,32 @@ namespace Isolation
                 return false;
             }
         }
+        private bool GameWon()
+            {
+            int[] PawnPosition = new int[2];
+            char enemy;
+            int tempCounter = 0;
+            if (whiteTurn == true)
+            {
+                PawnPosition = whitePawnPosition;
+                enemy = 'b';
+            }
+            else
+            {
+                PawnPosition = blackPawnPosition;
+                enemy = 'w';
+            }
+            if (PawnPosition[1] == 6 || gameBoard[PawnPosition[0], PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0], PawnPosition[1] + 1] == enemy) tempCounter++;
+            if (PawnPosition[0] == 6 || PawnPosition[1] == 6 || gameBoard[PawnPosition[0] + 1, PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1] + 1] == enemy) tempCounter++;
+            if (PawnPosition[0] == 0 || PawnPosition[1] == 6 || gameBoard[PawnPosition[0] - 1, PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1] + 1] == enemy) tempCounter++;
+            if (PawnPosition[0] == 6 || gameBoard[PawnPosition[0] + 1, PawnPosition[1]] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1]] == enemy) tempCounter++;
+            if (PawnPosition[0] == 6 || PawnPosition[1] == 0 || gameBoard[PawnPosition[0] + 1, PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1] - 1] == enemy) tempCounter++;
+            if (PawnPosition[1] == 0 || gameBoard[PawnPosition[0], PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0], PawnPosition[1] - 1] == enemy) tempCounter++;
+            if (PawnPosition[0] == 0 || PawnPosition[1] == 0 || gameBoard[PawnPosition[0] - 1, PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1] - 1] == enemy) tempCounter++;
+            if (PawnPosition[0] == 0 || gameBoard[PawnPosition[0] - 1, PawnPosition[1]] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1]] == enemy) tempCounter++;
+
+            if (tempCounter == 8) return true;
+            else return false;
+            }
     }
 }
