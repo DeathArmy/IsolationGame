@@ -69,6 +69,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Minimax\GameTree.cs" />
+    <Compile Include="Minimax\IGameTree.cs" />
+    <Compile Include="Minimax\Minimax.cs" />
+    <Compile Include="Minimax\Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
