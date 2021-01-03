@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Minimax;
 
 namespace Isolation
 {
@@ -104,6 +105,7 @@ namespace Isolation
             blackPawnPosition[1] = 3;
             SetProperBackground();
             turnsCount = 0;
+            ErrorBox.Text = "";
         }
         private void GameOnClick(object sender, MouseButtonEventArgs e)
         {
@@ -130,10 +132,13 @@ namespace Isolation
                                     whitePawnPosition[1] = j;
                                     whiteTurn = false;
                                     ErrorBox.Text = "";
-                                }
-                                else if (whiteTurn == false && playerOpponent == false)
-                                {
-
+                                    SetProperBackground();
+                                    turnsCount++;
+                                    if (playerOpponent == false)
+                                    {
+                                        SiMove();
+                                        turnsCount++;
+                                    }
                                 }
                                 else
                                 {
@@ -143,9 +148,9 @@ namespace Isolation
                                     blackPawnPosition[1] = j;
                                     whiteTurn = true;
                                     ErrorBox.Text = "";
+                                    SetProperBackground();
+                                    turnsCount++;
                                 }
-                                SetProperBackground();
-                                turnsCount++;
                                 break;
                             }
                             else
@@ -173,14 +178,22 @@ namespace Isolation
                                 gameBoard[i, j] = 'd';
                                 whiteTurn = false;
                                 ErrorBox.Text = "";
+                                SetProperBackground();
+                                turnsCount++;
+                                if (playerOpponent == false)
+                                {
+                                    SiMove();
+                                    turnsCount++;
+                                }
                             }
                             else
                             {
                                 gameBoard[i, j] = 'd';
                                 whiteTurn = true;
                                 ErrorBox.Text = "";
+                                SetProperBackground();
+                                turnsCount++;
                             }
-                            SetProperBackground();
                             break;
                         }
                     default:
@@ -270,6 +283,8 @@ namespace Isolation
                 {
                     case MessageBoxResult.OK:
                         {
+                            whiteTurn = true;
+                            ErrorBox.Text = "";
                             ResetGameButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                             break;
                         }
@@ -386,17 +401,40 @@ namespace Isolation
                 PawnPosition = blackPawnPosition;
                 enemy = 'w';
             }
-            if (PawnPosition[1] == 6 || gameBoard[PawnPosition[0], PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0], PawnPosition[1] + 1] == enemy) tempCounter++;
-            if (PawnPosition[0] == 6 || PawnPosition[1] == 6 || gameBoard[PawnPosition[0] + 1, PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1] + 1] == enemy) tempCounter++;
-            if (PawnPosition[0] == 0 || PawnPosition[1] == 6 || gameBoard[PawnPosition[0] - 1, PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1] + 1] == enemy) tempCounter++;
-            if (PawnPosition[0] == 6 || gameBoard[PawnPosition[0] + 1, PawnPosition[1]] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1]] == enemy) tempCounter++;
-            if (PawnPosition[0] == 6 || PawnPosition[1] == 0 || gameBoard[PawnPosition[0] + 1, PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1] - 1] == enemy) tempCounter++;
-            if (PawnPosition[1] == 0 || gameBoard[PawnPosition[0], PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0], PawnPosition[1] - 1] == enemy) tempCounter++;
-            if (PawnPosition[0] == 0 || PawnPosition[1] == 0 || gameBoard[PawnPosition[0] - 1, PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1] - 1] == enemy) tempCounter++;
-            if (PawnPosition[0] == 0 || gameBoard[PawnPosition[0] - 1, PawnPosition[1]] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1]] == enemy) tempCounter++;
+            if (PawnPosition[1] == 6 || gameBoard[PawnPosition[0], PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0], PawnPosition[1] + 1] == enemy) tempCounter++;//right
+            if (PawnPosition[0] == 0 || PawnPosition[1] == 6 || gameBoard[PawnPosition[0] - 1, PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1] + 1] == enemy) tempCounter++;//up-right
+            if (PawnPosition[0] == 6 || PawnPosition[1] == 6 || gameBoard[PawnPosition[0] + 1, PawnPosition[1] + 1] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1] + 1] == enemy) tempCounter++;//down-right
+            if (PawnPosition[0] == 0 || gameBoard[PawnPosition[0] - 1, PawnPosition[1]] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1]] == enemy) tempCounter++;//up
+            if (PawnPosition[0] == 0 || PawnPosition[1] == 0 || gameBoard[PawnPosition[0] - 1, PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0] - 1, PawnPosition[1] - 1] == enemy) tempCounter++;//up-left
+            if (PawnPosition[1] == 0 || gameBoard[PawnPosition[0], PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0], PawnPosition[1] - 1] == enemy) tempCounter++;//left
+            if (PawnPosition[0] == 6 || PawnPosition[1] == 0 || gameBoard[PawnPosition[0] + 1, PawnPosition[1] - 1] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1] - 1] == enemy) tempCounter++;//down-left
+            if (PawnPosition[0] == 6 || gameBoard[PawnPosition[0] + 1, PawnPosition[1]] == 'd' || gameBoard[PawnPosition[0] + 1, PawnPosition[1]] == enemy) tempCounter++;//down
 
             if (tempCounter == 8) return true;
             else return false;
             }
+        private void SiMove()
+        {
+            var gameTree = new GameTree(gameBoard);
+            var node = gameTree.CreateTree(playerOpponent, 4, null);
+
+            var miniMax = new Minimax.Minimax();
+            node.Value = miniMax.Compute(node, 3, playerOpponent);
+
+            var maxValue = node.Children.Max(c => c.Value);
+            var nextNode = node.Children.FirstOrDefault(c => c.Value == maxValue);
+
+            if (nextNode.ActionType == ActionType.Move)
+            {
+                int[] temp = new int[2] { nextNode.Coords.Y, nextNode.Coords.X };
+                blackPawnPosition = temp;
+            }
+           
+            gameBoard = nextNode.GameBoardState;
+            whiteTurn = false;
+            SetProperBackground();
+            whiteTurn = true;
+            ErrorBox.Text = "";
+        }
     }
 }
