@@ -28,6 +28,8 @@ namespace Isolation
                                                     {'e','e','e','e','e','e','e'},
                                                     {'e','e','e','w','e','e','e'},
                                                     };
+        private int turnsCount = 0;
+        private bool playerOpponent = true;
 
         public MainWindow()
         {
@@ -45,10 +47,46 @@ namespace Isolation
                 button.MouseEnter += GameMouseOver;
                 button.MouseLeave += GameMouseLeave;
             }
+            Pvp.Click += ChooseOpponent;
+            Pvs.Click += ChooseOpponent;
             SetProperBackground();
             ResetGameButton.Click += ResetGame;
         }
 
+        private void ChooseOpponent(object sender, RoutedEventArgs e)
+        {
+            var cb = (CheckBox)sender;
+            if (cb.Name == "Pvp")
+            {
+                Pvs.IsChecked = false;
+                Pvp.IsChecked = true;
+                if (turnsCount > 0)
+                {
+                    MessageBox.Show("Change will take effect in new game.");
+                    playerOpponent = true;
+                }
+                else
+                {
+                    playerOpponent = true;
+                    ResetGameButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                }
+            }
+            else
+            {
+                Pvp.IsChecked = false;
+                Pvs.IsChecked = true;
+                if (turnsCount > 0)
+                {
+                    MessageBox.Show("Change will take effect in new game.");
+                    playerOpponent = false;
+                }
+                else
+                {
+                    playerOpponent = false;
+                    ResetGameButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                }
+            }
+        }
         private void ResetGame(object sender, RoutedEventArgs e)
         {
             gameBoard = new char[7, 7] {{'e','e','e','b','e','e','e'},
@@ -65,6 +103,7 @@ namespace Isolation
             blackPawnPosition[0] = 0;
             blackPawnPosition[1] = 3;
             SetProperBackground();
+            turnsCount = 0;
         }
         private void GameOnClick(object sender, MouseButtonEventArgs e)
         {
@@ -92,6 +131,10 @@ namespace Isolation
                                     whiteTurn = false;
                                     ErrorBox.Text = "";
                                 }
+                                else if (whiteTurn == false && playerOpponent == false)
+                                {
+
+                                }
                                 else
                                 {
                                     gameBoard[i, j] = 'b';
@@ -102,6 +145,7 @@ namespace Isolation
                                     ErrorBox.Text = "";
                                 }
                                 SetProperBackground();
+                                turnsCount++;
                                 break;
                             }
                             else
@@ -215,10 +259,12 @@ namespace Isolation
                 if (whiteTurn)
                 {
                     result = MessageBox.Show("Black won!\nClicking \"OK\" will start a new game.\nClicking \"Cancel\" will close the game.", "Isolation Game", MessageBoxButton.OKCancel);
+                    Turn.Text = "Black won!";
                 }
                 else
                 {
                     result = MessageBox.Show("White won!\nClicking \"OK\" will start a new game.\nClicking \"Cancel\" will close the game.", "Isolation Game", MessageBoxButton.OKCancel);
+                    Turn.Text = "White won!";
                 }
                 switch (result)
                 {
@@ -237,6 +283,8 @@ namespace Isolation
             }
             else
             {
+                if (whiteTurn == true) Turn.Text = "Turn: White";
+                else Turn.Text = "Turn: Black";
                 List<Button> buttons = new List<Button>() { btn00, btn01, btn02, btn03, btn04, btn05, btn06,
                                                         btn10, btn11, btn12, btn13, btn14, btn15, btn16,
                                                         btn20, btn21, btn22, btn23, btn24, btn25, btn26,

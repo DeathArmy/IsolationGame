@@ -269,8 +269,17 @@
             </StackPanel>
         </StackPanel>
         <StackPanel Width="625" Margin="25,10,0,10" HorizontalAlignment="Left">
-            <TextBlock x:Name="ErrorBox" Text="" Foreground="Red" HorizontalAlignment="Center" FontSize="24" TextWrapping="Wrap"></TextBlock>
+            <TextBlock x:Name="ErrorBox" Text="" Foreground="WhiteSmoke" HorizontalAlignment="Center" FontSize="28" TextWrapping="Wrap"></TextBlock>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <CheckBox Name="Pvp" Content="Player vs. Player" IsChecked="True" Foreground="WhiteSmoke" FontSize="16"></CheckBox>
+                <CheckBox Name="Pvs" Content="Player vs. SI" Margin="20,0,0,0" Foreground="WhiteSmoke" FontSize="16"></CheckBox>
+            </StackPanel>
             <Button Name="ResetGameButton" Width="100" Height="40" HorizontalAlignment="Left" Margin="10,0">New game</Button>
+            <TextBlock x:Name="Turn" Text="" Foreground="WhiteSmoke" HorizontalAlignment="Center" FontSize="24" TextWrapping="Wrap"></TextBlock>
+            <StackPanel Margin="0,550,0,0" Width="625">
+                <TextBlock Text="Game rules:" Foreground="WhiteSmoke" HorizontalAlignment="Center" FontSize="28" TextWrapping="Wrap"></TextBlock>
+                <TextBlock Text="A move consists of two subsequent actions:&#x0a;1. Moving one's piece to a neighboring (horizontally, vertically, or diagonally) position that contains a square but not the opponent's piece.&#x0a;2. Removing any square with no piece on it.&#x0a;The player who cannot make any move loses the game." Foreground="WhiteSmoke" HorizontalAlignment="Center" FontSize="20" TextWrapping="Wrap"></TextBlock>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>
