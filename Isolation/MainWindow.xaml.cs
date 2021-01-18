@@ -445,10 +445,14 @@ namespace Isolation
             var node = gameTree.CreateTree(playerOpponent, 4, null);
 
             var miniMax = new Minimax.Minimax();
-            node.Value = miniMax.Compute(node, 3, playerOpponent);
+            node.Value = miniMax.Compute(node, 3, int.MinValue, int.MaxValue, playerOpponent);
 
-            var maxValue = node.Children.Max(c => c.Value);
-            var nextNode = node.Children.FirstOrDefault(c => c.Value == maxValue);
+            int value = 0;
+
+            value = node.Children.Min(c => c.Value);
+
+            node.Children.Reverse();
+            var nextNode = node.Children.OrderBy(c => Guid.NewGuid()).FirstOrDefault(c => c.Value == value);
 
             gameBoard = nextNode.GameBoardState;
 

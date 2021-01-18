@@ -67,7 +67,7 @@ namespace Minimax
                 var node = new Node
                     {
                         Parent = parent,
-                        Coords = (n.Y, n.X),
+                        Coords = (n.X, n.Y),
                         Depth = parent.Depth - 1,
                         ActionType = ActionType.Move,
                         GameBoardState = boardState
@@ -85,7 +85,7 @@ namespace Minimax
                 var node = new Node
                     {
                         Parent = parent,
-                        Coords = (n.Y, n.X),
+                        Coords = (n.X, n.Y),
                         Depth = parent.Depth - 1,
                         ActionType = ActionType.Block,
                         GameBoardState = boardState
