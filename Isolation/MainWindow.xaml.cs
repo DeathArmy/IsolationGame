@@ -439,10 +439,10 @@ namespace Isolation
         private void SiMove()
         {
             var gameTree = new GameTree(gameBoard);
-            var node = gameTree.CreateTree(playerOpponent, 5, null);
+            var node = gameTree.CreateTree(playerOpponent, 4, null);
 
             var miniMax = new Minimax.Minimax();
-            node.Value = miniMax.Compute(node, 4, int.MinValue, int.MaxValue, true);
+            node.Value = miniMax.Compute(node, 3, int.MinValue, int.MaxValue, true);
 
             int value = 0;
 

@@ -73,7 +73,8 @@ namespace Minimax
                 node.Parent.GameBoardState).Count;
 
             //score = moveScore - parentMoveScore + parentBlockScore - blockScore; 
-            score = ((8 - moveScore) * 5 + parentMoveScore * 10) + (8 - blockScore) * 10 + 5; 
+            //score = ((8 - moveScore) * 5 + parentMoveScore * 10) + (8 - blockScore) * 10 + 5; 
+            score = (moveScore * 10 + parentMoveScore * 8) + (8 - blockScore) * 13; 
 
             return score;
         }
