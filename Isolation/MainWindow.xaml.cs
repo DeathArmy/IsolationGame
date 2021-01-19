@@ -288,7 +288,43 @@ namespace Isolation
             }
         }
         private void SetProperBackground()
+        {  
+        if (whiteTurn == true) Turn.Text = "Turn: White";
+        else Turn.Text = "Turn: Black";
+        List<Button> buttons = new List<Button>() { btn00, btn01, btn02, btn03, btn04, btn05, btn06,
+                                                btn10, btn11, btn12, btn13, btn14, btn15, btn16,
+                                                btn20, btn21, btn22, btn23, btn24, btn25, btn26,
+                                                btn30, btn31, btn32, btn33, btn34, btn35, btn36,
+                                                btn40, btn41, btn42, btn43, btn44, btn45, btn46,
+                                                btn50, btn51, btn52, btn53, btn54, btn55, btn56,
+                                                btn60, btn61, btn62, btn63, btn64, btn65, btn66};
+        foreach (var button in buttons)
         {
+            string btnName = button.Name;
+            int i, j = 0;
+            int.TryParse(btnName[btnName.Length - 2].ToString(), out i);
+            int.TryParse(btnName[btnName.Length - 1].ToString(), out j);
+            ImageBrush tempImg = new ImageBrush();
+            if (gameBoard[i, j] == 'e')
+            {
+                tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none.png"));
+                button.Background = tempImg;
+            }
+            else if (gameBoard[i, j] == 'b')
+            {
+                tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_black_pawn.png"));
+                button.Background = tempImg;
+            }
+            else if (gameBoard[i, j] == 'w')
+            {
+                tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_white_pawn.png"));
+                button.Background = tempImg;
+            }
+            else
+            {
+                tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Inactive_none.png"));
+                button.Background = tempImg;
+            }
             if (GameWon())
             {
                 MessageBoxResult result;
@@ -320,45 +356,6 @@ namespace Isolation
                 }
                 return;
             }
-            else
-            {
-                if (whiteTurn == true) Turn.Text = "Turn: White";
-                else Turn.Text = "Turn: Black";
-                List<Button> buttons = new List<Button>() { btn00, btn01, btn02, btn03, btn04, btn05, btn06,
-                                                        btn10, btn11, btn12, btn13, btn14, btn15, btn16,
-                                                        btn20, btn21, btn22, btn23, btn24, btn25, btn26,
-                                                        btn30, btn31, btn32, btn33, btn34, btn35, btn36,
-                                                        btn40, btn41, btn42, btn43, btn44, btn45, btn46,
-                                                        btn50, btn51, btn52, btn53, btn54, btn55, btn56,
-                                                        btn60, btn61, btn62, btn63, btn64, btn65, btn66};
-                foreach (var button in buttons)
-                {
-                    string btnName = button.Name;
-                    int i, j = 0;
-                    int.TryParse(btnName[btnName.Length - 2].ToString(), out i);
-                    int.TryParse(btnName[btnName.Length - 1].ToString(), out j);
-                    ImageBrush tempImg = new ImageBrush();
-                    if (gameBoard[i, j] == 'e')
-                    {
-                        tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none.png"));
-                        button.Background = tempImg;
-                    }
-                    else if (gameBoard[i, j] == 'b')
-                    {
-                        tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_black_pawn.png"));
-                        button.Background = tempImg;
-                    }
-                    else if (gameBoard[i, j] == 'w')
-                    {
-                        tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Active_none_white_pawn.png"));
-                        button.Background = tempImg;
-                    }
-                    else
-                    {
-                        tempImg.ImageSource = new BitmapImage(new Uri(@"pack://application:,,,/Assets/Inactive_none.png"));
-                        button.Background = tempImg;
-                    }
-                }
             }           
         }
         private bool MoveIsValid(int[] newCords)
@@ -442,16 +439,17 @@ namespace Isolation
         private void SiMove()
         {
             var gameTree = new GameTree(gameBoard);
-            var node = gameTree.CreateTree(playerOpponent, 4, null);
+            var node = gameTree.CreateTree(playerOpponent, 5, null);
 
             var miniMax = new Minimax.Minimax();
-            node.Value = miniMax.Compute(node, 3, int.MinValue, int.MaxValue, playerOpponent);
+            node.Value = miniMax.Compute(node, 4, int.MinValue, int.MaxValue, true);
 
             int value = 0;
 
-            value = node.Children.Min(c => c.Value);
+            value = node.Children.Max(c => c.Value);
+            //List<int> forDebbug = new List<int>();
+            //node.Children.ForEach(a => forDebbug.Add(a.Value));
 
-            node.Children.Reverse();
             var nextNode = node.Children.OrderBy(c => Guid.NewGuid()).FirstOrDefault(c => c.Value == value);
 
             gameBoard = nextNode.GameBoardState;
